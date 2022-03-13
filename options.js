@@ -15,5 +15,13 @@ module.exports = {
                 [{text: 'Play again', callback_data: '/again'}]
             ]
         })
+    },
+    requestInfo: {
+        reply_markup: {
+            keyboard: [
+                [{text: 'Send my location', request_location: true}],
+                [{text: 'Send my contact', request_contact: true}]
+            ]
+        }
     }
 }
