@@ -6,6 +6,7 @@ const {startMessage, infoMessage, currentDateAndTime, textToBot} = require('./co
 
 const token = process.env.TELEGRAM_TOKEN
 const bot = new TelegramAPI(token, {polling: true})
+const thisTime = new Date()
 
 
 
@@ -47,7 +48,8 @@ const start = async () => {
             return bot.sendMessage(chatId, infoMessage(), {parse_mode: 'HTML'})
         }
         if (text === '/date') {
-            return bot.sendMessage(chatId, `Current time - ${currentDateAndTime}`)
+            // return bot.sendMessage(chatId, `Current time - ${currentDateAndTime}`)
+            return bot.sendMessage(chatId, `Current time - ${thisTime}`)
         }
         if (text === '/game') {
             await bot.sendMessage(chatId, 'Lets play! Guess the number from 0 to 9');
