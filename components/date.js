@@ -6,5 +6,10 @@ ${days[time.getDay()]}
 ${months[time.getMonth()]} ${time.getDate()}, ${time.getFullYear()}
 ${time.getHours()}:${time.getMinutes()}
 `
+const currentDate = {
+    // en: `Current date - ${currentDateAndTime}`, 
+    en: `Current date - ${time.toLocaleString()}`, 
+    ru: `Текущая дата - ${time.toLocaleString()}`
+}
 
-module.exports = currentDateAndTime
+module.exports = currentDate
