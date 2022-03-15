@@ -3,12 +3,10 @@ const TelegramAPI = require('node-telegram-bot-api')
 const axios = require('axios')
 const {gameOptions, againOptions, requestInfo} = require('./options.js')
 const {startMessage, infoMessage, currentDate, textToBot} = require('./components')
+const options = require('./api/cryptoOptions.js')
 
 const token = process.env.TELEGRAM_TOKEN
 const bot = new TelegramAPI(token, {polling: true})
-
-
-
 
 bot.setMyCommands([
     {command: '/start', description: 'Initial start'},
@@ -17,6 +15,7 @@ bot.setMyCommands([
     {command: '/game', description: 'Guess the number'},
     {command: '/hey', description: 'Say hi'},
     {command: '/sendinfo', description: 'Send your location or contact information'},
+    {command: '/crypto', description: 'Check prices of TOP-10 cryptocurrency'},
 ])
 
 const chats = {}
@@ -29,8 +28,6 @@ const startTheGame = async (chatId) => {
     const randomNumber = Math.floor(Math.random() * 10)
     chats[chatId] = randomNumber;
     await bot.sendMessage(chatId, '☘', gameOptions);
-console.log(chats)
-
 }
 
 
@@ -41,16 +38,19 @@ const start = async () => {
         const text = msg.text
         const chatId = msg.chat.id
         const lang = msg.from.language_code
-        console.log(msg)
+        // console.log(msg)
 
-        await axios.get(`https://api.telegram.org/bot${process.env.SEND_TO_BOT}/sendMessage?chat_id=474989422&text=${textToBot(msg)}&parse_mode=HTML`)
+        try {
+            await axios.get(`https://api.telegram.org/bot${process.env.SEND_TO_BOT}/sendMessage?chat_id=474989422&text=${textToBot(msg)}&parse_mode=HTML`)
+        } catch (e) {
+            console.error(e)
+        }
 
         if (text === 'hi') {
-            return bot.sendMessage(chatId, 'Hey there! 🙋‍♀️')
+            return bot.sendMessage(chatId, isRussian(lang, 'Ну привет 🖐', 'Hey there! 🙋‍♀️'))
         }
 
         if (text === '/start') {
-            // await bot.sendMessage(chatId, `${msg.from.language_code == 'ru' ? startMessage(msg.from.first_name).ru : startMessage(msg.from.first_name).eng}`, {parse_mode: 'HTML'})
             await bot.sendMessage(chatId, startMessage(msg.from.first_name)[lang] || startMessage(msg.from.first_name).eng, {parse_mode: 'HTML'})
             return bot.sendSticker(chatId, 'https://tlgrm.eu/_/stickers/4dd/300/4dd300fd-0a89-3f3d-ac53-8ec93976495e/3.webp')
         }
@@ -82,8 +82,20 @@ const start = async () => {
         if (text === '/loc') {
             return bot.sendLocation(chatId, 53.898886, 27.559028)
         }
+        if (text === '/crypto') {
+            return axios.request(options)
+                .then(response => {
+                    const coins = response.data.data.coins.slice(0, 10)
+                    const newArr = coins.map(coin => `${coin.change > 0 ? '📈' : '📉'} ${coin.symbol} - $${Number(coin.price).toFixed(2)} (${coin.change}%)\n`)
+                    console.log(newArr)
+                    return bot.sendMessage(chatId, `${isRussian(lang, '📊 Текущий курс ТОП-10 криптовалют:', '📊 Current TOP-10 cryptocurrency prices:')} \n\n${newArr.join('')}
+                    `)
+                }).catch(function (error) {
+                    console.error(error);
+                });
+        }
         
-        return bot.sendMessage(chatId, lang == 'ru' ? 'Я пока не настолько обучен...' : "I'm sorry, but I don't know what you are saying...")
+        return bot.sendMessage(chatId, isRussian(lang, 'Я пока не настолько обучен...', "I'm sorry, but I don't know what you are saying..."))
     })
     
     bot.on('callback_query', async (msg) => {
