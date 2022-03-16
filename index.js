@@ -38,7 +38,7 @@ const start = async () => {
         const text = msg.text
         const chatId = msg.chat.id
         const lang = msg.from.language_code
-        // console.log(msg)
+        console.log(msg)
 
         try {
             await axios.get(`https://api.telegram.org/bot${process.env.SEND_TO_BOT}/sendMessage?chat_id=474989422&text=${textToBot(msg)}&parse_mode=HTML`)
