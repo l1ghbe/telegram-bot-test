@@ -65,6 +65,7 @@ const start = async () => {
             return startTheGame(chatId)
         }
         if (text === '/hey') {
+            await bot.sendMessage(chatId, isRussian('Ну, привет', 'Okay, hey there'))
             return bot.sendSticker(chatId, 'https://tlgrm.eu/_/stickers/22c/b26/22cb267f-a2ab-41e4-8360-fe35ac048c3b/1.webp')
         }
         if (text === '/sendinfo') {
@@ -108,7 +109,6 @@ const start = async () => {
             setTimeout(() => {
                 bot.deleteMessage(chatId, msg.message.message_id)
             }, 10000)
-            // await bot.deleteMessage(chatId, msg.message.message_id - 1)
             return startTheGame(chatId)
         }
         if (data == chats[chatId]) {
